@@ -30,12 +30,18 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
+/* ⚠️ overflow-x:hidden, position:sticky'yi bozar (eleman kaydırma kabına
+   göre yapışır, gövde kaydırma kabına dönüşünce yapışacak yer kalmaz).
+   overflow-x:clip aynı kırpmayı yapar ama kaydırma kabı OLUŞTURMAZ.
+   Desteklemeyen tarayıcı ilk satırda kalır. Üst bar ayrıca fixed. */
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;
+     overflow-x:hidden;overflow-x:clip}
 body{
   margin:0;background:var(--zemin);color:var(--ink);
   font:16px/1.65 'Jakarta',-apple-system,BlinkMacSystemFont,system-ui,'Segoe UI',Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  overflow-x:hidden;overflow-wrap:break-word;
+  overflow-x:hidden;overflow-x:clip;overflow-wrap:break-word;
+  padding-top:var(--ust-h);
 }
 img,video{max-width:100%;height:auto;display:block}
 /* <picture> varsayılan olarak satır içi; araya girdiğinde içindeki img'nin
@@ -56,6 +62,8 @@ h2{font-size:clamp(1.55rem,1.2rem + 1.5vw,2.4rem)}
 h3{font-size:clamp(1.1rem,1rem + .45vw,1.35rem)}
 p{margin:0 0 1.05em}
 .kap{width:100%;max-width:var(--kap);margin-inline:auto;padding-inline:clamp(16px,4vw,28px)}
+/* Sabit üst bar, #bolum bağlantılarıyla gidilen başlıkları örtmesin. */
+[id]{scroll-margin-top:calc(var(--ust-h) + 14px)}
 .bolum{padding:clamp(56px,8vw,104px) 0}
 .bolum-koyu{background:var(--navy);color:#eaf1ff}
 .merkez{text-align:center}
@@ -100,7 +108,7 @@ p{margin:0 0 1.05em}
 .dg-kucuk{padding:11px 20px;font-size:14px}
 
 /* ── Üst bar ──────────────────────────────────────────────────────────────── */
-.ust{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);
+.ust{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,255,255,.92);
      backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
      border-bottom:1px solid var(--cizgi);transition:box-shadow .3s}
 .ust-ic{display:flex;align-items:center;gap:18px;height:var(--ust-h)}
