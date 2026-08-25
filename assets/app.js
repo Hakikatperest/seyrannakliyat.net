@@ -85,52 +85,32 @@
       if (e.animationName === 'egikAc') egik.classList.add('acildi');
     });
   }
-  if (sahne && egik && !azHareket) {
-    var temelRX = 7, temelRY = -9;
-    if (matchMedia('(max-width:1000px)').matches) { temelRX = 5; temelRY = -6; }
-
-    var fareX = 0, fareY = 0, egimX = 0, egimY = 0, kaydirma = 0, bekleyen = null;
+  /* Eğim YALNIZCA fareli masaüstünde. Mobilde görsel dümdüz durur —
+     kaydırmaya bağlı eğim ve cihaz eğimi denendi, kullanıcı "resim yamuk
+     kalıyor" diye iki kez bildirdi. Mobildeki derinlik açılış animasyonu,
+     gölge ve perspektiften geliyor; görselin kendisi eğilmiyor. */
+  if (sahne && egik && !azHareket &&
+      matchMedia('(hover: hover) and (pointer: fine)').matches &&
+      matchMedia('(min-width:1001px)').matches) {
+    var bekleyen = null, sonX = 0, sonY = 0;
 
     function ciz() {
       bekleyen = null;
-      var rx = temelRX - fareY * 11 - egimX + kaydirma * 9;
-      var ry = temelRY + fareX * 13 + egimY;
-      egik.style.setProperty('--rx', rx.toFixed(2) + 'deg');
-      egik.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+      egik.style.setProperty('--rx', (7 - sonY * 11).toFixed(2) + 'deg');
+      egik.style.setProperty('--ry', (-9 + sonX * 13).toFixed(2) + 'deg');
     }
     function iste() { if (!bekleyen) bekleyen = requestAnimationFrame(ciz); }
 
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      sahne.addEventListener('pointermove', function (e) {
-        var k = sahne.getBoundingClientRect();
-        fareX = (e.clientX - k.left) / k.width - 0.5;
-        fareY = (e.clientY - k.top) / k.height - 0.5;
-        iste();
-      });
-      sahne.addEventListener('pointerleave', function () { fareX = fareY = 0; iste(); });
-    }
-
-    /* Kaydırdıkça görsel hafifçe arkaya yatar — mobilde asıl derinlik burada. */
-    addEventListener('scroll', function () {
+    sahne.addEventListener('pointermove', function (e) {
       var k = sahne.getBoundingClientRect();
-      if (k.bottom < 0 || k.top > innerHeight) return;
-      kaydirma = Math.max(-1, Math.min(1, -k.top / innerHeight));
+      sonX = (e.clientX - k.left) / k.width - 0.5;
+      sonY = (e.clientY - k.top) / k.height - 0.5;
       iste();
-    }, { passive: true });
-
-    /* Cihaz eğimi: iOS izin istediği için yalnızca izin gerektirmeyen
-       tarayıcılarda (Android) bağlanıyor; istem çıkarıp kullanıcıyı
-       rahatsız etmiyoruz. */
-    if (window.DeviceOrientationEvent &&
-        typeof DeviceOrientationEvent.requestPermission !== 'function' &&
-        matchMedia('(hover: none)').matches) {
-      addEventListener('deviceorientation', function (e) {
-        if (e.beta === null && e.gamma === null) return;
-        egimX = Math.max(-8, Math.min(8, ((e.beta || 0) - 45) * 0.16));
-        egimY = Math.max(-9, Math.min(9, (e.gamma || 0) * 0.20));
-        iste();
-      }, { passive: true });
-    }
+    });
+    sahne.addEventListener('pointerleave', function () {
+      egik.style.removeProperty('--rx');
+      egik.style.removeProperty('--ry');
+    });
   }
 
   /* ── Sayaçlar ────────────────────────────────────────────────────────── */
