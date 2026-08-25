@@ -125,21 +125,20 @@ def resim(ad, alt, genislikler, boyutlar, sinif='', oncelik=False, en=None, boy=
                              (' class="%s"' % sinif) if sinif else '')
 
 
-LOGO_ISARET = (
-    '<span class="logo-im" aria-hidden="true">'
-    '<svg viewBox="0 0 32 32" fill="none">'
-    '<path d="M4.6 14.6 16 5.6l11.4 9" stroke="currentColor" stroke-width="2.7" '
-    'stroke-linecap="round" stroke-linejoin="round"/>'
-    '<path d="M7.6 16.9V25a1.4 1.4 0 0 0 1.4 1.4h14a1.4 1.4 0 0 0 1.4-1.4v-8.1" '
-    'stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>'
-    '<rect x="13.1" y="18.4" width="5.8" height="8" rx="1.4" fill="currentColor"/>'
-    '</svg></span>')
-
-def logo(alt_metin=True):
-    """Üst bar ve alt bilgi logosu."""
-    return ('%s<span class="logo-yazi"><span class="logo-ad">SEYRAN</span>'
-            '<span class="logo-alt"><span class="logo-uzun">EVDEN EVE </span>NAKLİYAT</span>'
-            '</span>') % LOGO_ISARET
+# ── Logo ─────────────────────────────────────────────────────────────────────
+# Firmanın gerçek logosu (images/seyran-nakliyat-logo.png). Kaynak 1,1 MB
+# olduğu için sitede DOĞRUDAN kullanılmaz; _src/logo.py küçük türevler üretir.
+# İki varyant şart: özgün logodaki "SEYRAN" yazısı lacivert olduğu için
+# lacivert alt bilgide tamamen kayboluyor — orada beyaz varyant kullanılır.
+def logo(koyu_zemin=False):
+    ad = 'seyran-logo-acik' if koyu_zemin else 'seyran-logo'
+    olcu = '104px' if koyu_zemin else '90px'
+    return ('<img class="logo-im" src="/images/logo/%s-280.png" '
+            'srcset="/images/logo/%s-180.webp 180w, /images/logo/%s-280.webp 280w, '
+            '/images/logo/%s-420.webp 420w" sizes="%s" '
+            'width="1374" height="971" alt="%s — evden eve nakliyat" '
+            'decoding="async"%s>') % (ad, ad, ad, ad, olcu, e(FIRMA['tam_ad']),
+                                      ' fetchpriority="high"' if not koyu_zemin else ' loading="lazy"')
 
 def ust_bar(koyu=False):
     """Üst bar her sayfada AYNI: açık cam zemin, lacivert logo.
@@ -192,7 +191,7 @@ def alt_bilgi():
   <div class="kap">
     <div class="alt-ic">
       <div>
-        <a class="logo" href="/" style="margin-bottom:16px">%s</a>
+        <a class="logo logo-alt-zemin" href="/" style="margin-bottom:16px">%s</a>
         <p style="font-size:14.5px;max-width:42ch">%s — %s. %s yıldır İstanbul merkezli
         çalışıyor, Türkiye’nin her iline sigortalı taşıma yapıyoruz.</p>
         <p style="font-size:14.5px"><strong style="color:#fff">%s</strong><br>%s</p>
@@ -212,7 +211,7 @@ def alt_bilgi():
       <span>%s</span>
     </div>
   </div>
-</footer>""" % (logo(), e(FIRMA['tam_ad']), e(FIRMA['slogan']), FIRMA['tecrube_yili'],
+</footer>""" % (logo(koyu_zemin=True), e(FIRMA['tam_ad']), e(FIRMA['slogan']), FIRMA['tecrube_yili'],
                 e(FIRMA['adres_kisa']), e(FIRMA['telefon_uluslararasi']),
                 TEL, ikon('telefon'), e(FIRMA['telefon']),
                 hizmet_bag, ilce_bag, e(FIRMA['ad']), e(FIRMA['alan_adi']))
@@ -239,7 +238,8 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/pjs-var-tr.woff2" crossorigin>
 <script>document.documentElement.className+=" js"</script>
 <link rel="stylesheet" href="/assets/style.css?v=%s">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/images/logo/isaret-180.png" type="image/png">
+<link rel="apple-touch-icon" href="/images/logo/isaret-180.png">
 <script type="application/ld+json">%s</script>
 </head>
 <body>
@@ -781,21 +781,6 @@ def sayfa_404():
                    'Aradığınız sayfa bulunamadı.', SITE + '/404.html', govde,
                    isletme_ld(SITE))
 
-def favicon():
-    """Sekme simgesi — üst bardaki marka işaretinin aynısı."""
-    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-            '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-            '<stop offset="0" stop-color="#ff9a52"/><stop offset=".48" stop-color="#f26722"/>'
-            '<stop offset="1" stop-color="#d8232a"/></linearGradient></defs>'
-            '<rect width="64" height="64" rx="16" fill="url(#g)"/>'
-            '<g transform="translate(16 16) scale(1)" stroke="#fff" fill="none" '
-            'stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">'
-            '<path d="M4.6 14.6 16 5.6l11.4 9"/>'
-            '<path d="M7.6 16.9V25a1.4 1.4 0 0 0 1.4 1.4h14a1.4 1.4 0 0 0 1.4-1.4v-8.1"/>'
-            '</g>'
-            '<rect x="42.2" y="52.4" width="11.6" height="16" rx="2.8" fill="#fff" '
-            'transform="translate(-16 -16)"/></svg>')
-
 def sitemap(tarih):
     girdiler = ['<url><loc>%s/</loc><lastmod>%s</lastmod><changefreq>weekly</changefreq>'
                 '<priority>1.0</priority></url>' % (SITE, tarih)]
@@ -840,7 +825,6 @@ def main():
         print('  %-34s %6.0f KB' % (slug + '-evden-eve-nakliyat/', b / 1024))
 
     toplam += yaz('404.html', sayfa_404())
-    toplam += yaz('favicon.svg', favicon())
     toplam += yaz('sitemap.xml', sitemap(tarih))
     toplam += yaz('robots.txt', robots())
     yaz('CNAME', FIRMA['alan_adi'] + '\n')

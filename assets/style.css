@@ -26,7 +26,7 @@
   --isik-koyu:inset 0 1px 0 rgba(255,255,255,.10);
   --tur-golge:0 6px 18px rgba(242,103,34,.34);
   --gecis:.42s cubic-bezier(.22,.68,0,1);
-  --kap:1200px;
+  --kap:1200px; --ust-h:78px;
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -103,48 +103,17 @@ p{margin:0 0 1.05em}
 .ust{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.92);
      backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
      border-bottom:1px solid var(--cizgi);transition:box-shadow .3s}
-.ust-ic{display:flex;align-items:center;gap:18px;height:74px}
+.ust-ic{display:flex;align-items:center;gap:18px;height:var(--ust-h)}
 .ust.yapisik{box-shadow:0 2px 24px rgba(13,21,38,.10)}
 .logo{display:flex;align-items:center;gap:11px;flex:none;text-decoration:none}
 .logo:hover{text-decoration:none}
-/* ── Marka işareti ────────────────────────────────────────────────────────
-   Kutu içinde harf değil, gerçek ev simgesi (poster logosundaki kimlik).
-   Derinlik dört katmandan geliyor: gradyan, üstte iç ışık, altta iç gölge,
-   dışarıda renkli yayılma. Üstüne ince bir ışık halkası biniyor. */
-.logo-im{
-  position:relative;width:50px;height:50px;border-radius:15px;flex:none;
-  display:grid;place-items:center;color:#fff;
-  background:linear-gradient(150deg,#ff9c55 0%,var(--turuncu) 46%,var(--kirmizi) 100%);
-  box-shadow:0 10px 24px rgba(216,35,42,.34), 0 2px 6px rgba(216,35,42,.26),
-             inset 0 1.5px 0 rgba(255,255,255,.58),
-             inset 0 -3px 9px rgba(120,22,0,.34);
-  transition:transform .3s cubic-bezier(.22,.68,0,1),box-shadow .3s;
-}
-.logo-im::after{
-  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-  border:1px solid rgba(255,255,255,.34);
-  -webkit-mask:linear-gradient(#000,rgba(0,0,0,0) 62%);
-  mask:linear-gradient(#000,rgba(0,0,0,0) 62%);
-}
-.logo-im svg{width:27px;height:27px;position:relative;
-  filter:drop-shadow(0 1.5px 1.5px rgba(120,22,0,.35))}
-.logo:hover .logo-im{transform:translateY(-1px) rotate(-2deg);
-  box-shadow:0 14px 30px rgba(216,35,42,.42), 0 2px 6px rgba(216,35,42,.26),
-             inset 0 1.5px 0 rgba(255,255,255,.58), inset 0 -3px 9px rgba(120,22,0,.34)}
-
-.logo-yazi{display:block;min-width:0}
-.logo-ad{
-  display:block;font-weight:800;font-size:22px;letter-spacing:-.045em;line-height:1;
-  background:linear-gradient(180deg,#26467e 0%,var(--navy) 78%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  -webkit-text-fill-color:transparent;
-}
-.logo-alt{
-  display:block;margin-top:3px;font-size:9.5px;font-weight:800;letter-spacing:.185em;
-  text-transform:uppercase;color:var(--turuncu);line-height:1;white-space:nowrap;
-}
-/* Alt bilgideki koyu zeminli logo */
-.alt .logo-ad{background:none;color:#fff;-webkit-text-fill-color:#fff}
+/* ── Logo ─────────────────────────────────────────────────────────────────
+   Firmanın gerçek logosu (görsel). Açık zeminde özgün renkler, koyu zeminde
+   beyaz varyant — özgün logodaki lacivert yazı lacivert zeminde kayboluyor. */
+.logo-im{height:58px;width:auto;flex:none;display:block;
+  transition:transform .3s cubic-bezier(.22,.68,0,1)}
+.logo:hover .logo-im{transform:scale(1.04)}
+.alt .logo-im{height:66px}
 
 .menu{display:flex;gap:4px;margin-left:auto}
 .menu a{padding:10px 15px;border-radius:999px;font-size:15px;font-weight:650;
@@ -491,15 +460,16 @@ html.js .gel.gorundu{opacity:1;transform:none}
 }
 @media(max-width:860px){
   .vitrinler{grid-template-columns:1fr;gap:16px}
-  .menu{position:fixed;inset:74px 0 auto;flex-direction:column;gap:0;padding:14px;
+  .menu{position:fixed;inset:var(--ust-h) 0 auto;flex-direction:column;gap:0;padding:14px;
     background:rgba(255,255,255,.98);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     border-bottom:1px solid var(--cizgi);box-shadow:0 20px 44px rgba(13,21,38,.14);
     transform:translateY(-12px);opacity:0;pointer-events:none;transition:opacity .26s,transform .26s;
-    max-height:calc(100dvh - 74px);overflow-y:auto}
+    max-height:calc(100dvh - var(--ust-h));overflow-y:auto}
   .menu.acik{transform:none;opacity:1;pointer-events:auto}
   .menu a{padding:15px 16px;border-radius:12px;font-size:16.5px;font-weight:700;
     color:var(--navy);border-bottom:1px solid var(--cizgi-2)}
   .menu a:last-child{border-bottom:0}
+  :root{--ust-h:72px}
   .menu-dug{display:grid}
   /* .menu position:fixed olduğu için margin-left:auto ile sağa iten öğe
      akıştan çıkıyor; sağ bloğu burada biz itiyoruz. */
@@ -511,11 +481,8 @@ html.js .gel.gorundu{opacity:1;transform:none}
   .serit-ic{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:470px){
-  /* Dar ekranda "EVDEN EVE" düşer, "NAKLİYAT" kalır — logo taşmasın. */
-  .logo-uzun{display:none}
-  .logo-im{width:46px;height:46px;border-radius:14px}
-  .logo-im svg{width:25px;height:25px}
-  .logo-ad{font-size:20px}
+  :root{--ust-h:68px}
+  .logo-im{height:48px}
 }
 @media(max-width:620px){
   .vitrin-bant{flex-wrap:wrap;padding:40px 14px 14px;gap:10px}
