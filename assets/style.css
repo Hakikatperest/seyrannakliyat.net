@@ -152,14 +152,23 @@ p{margin:0 0 1.05em}
   -webkit-mask-image:radial-gradient(72% 62% at 50% 34%,#000,transparent 78%);
 }
 @keyframes isikGez{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(-4%,3%,0) scale(1.1)}}
-.kahraman-ic{display:grid;grid-template-columns:1.03fr .97fr;gap:clamp(30px,4vw,64px);
-  align-items:center;padding:clamp(38px,5vw,76px) 0 clamp(58px,7vw,100px)}
+/* Kahraman dört parça: yazı, düğmeler, rozetler, görsel.
+   Ayrı ızgara öğeleri oldukları için mobilde sıralarını değiştirebiliyoruz —
+   kullanıcı isteği: düğmeler GÖRSELİN HEMEN ALTINDA olmalı. */
+.kahraman-ic{display:grid;grid-template-columns:1.03fr .97fr;
+  grid-template-areas:"yazi gorsel" "dugme gorsel" "rozet gorsel";
+  gap:0 clamp(30px,4vw,64px);align-content:center;
+  padding:clamp(38px,5vw,76px) 0 clamp(58px,7vw,100px)}
+.k-yazi{grid-area:yazi}
+.kahraman-dug{grid-area:dugme}
+.rozetler{grid-area:rozet}
+.sahne{grid-area:gorsel;align-self:center}
 .kahraman h1{color:#fff;margin-bottom:20px;text-wrap:balance}
 .kahraman h1 em{font-style:normal;display:block;
   background:linear-gradient(100deg,var(--turuncu-2),#ffc48a 55%,var(--turuncu));
   -webkit-background-clip:text;background-clip:text;color:transparent}
-.kahraman-spot{color:#b9cbe9;font-size:clamp(1.02rem,.98rem + .3vw,1.18rem);max-width:56ch;margin-bottom:30px}
-.kahraman-dug{display:flex;gap:13px;flex-wrap:wrap;margin-bottom:34px}
+.kahraman-spot{color:#b9cbe9;font-size:clamp(1.02rem,.98rem + .3vw,1.18rem);max-width:56ch;margin-bottom:0}
+.kahraman-dug{display:flex;gap:13px;flex-wrap:wrap;margin:30px 0 26px}
 .rozetler{display:flex;gap:10px;flex-wrap:wrap}
 .rozet{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
@@ -427,8 +436,12 @@ p{margin:0 0 1.05em}
 
 /* ── Duyarlı ──────────────────────────────────────────────────────────────── */
 @media(max-width:1000px){
-  .kahraman-ic{grid-template-columns:1fr;gap:38px}
-  .sahne{order:-1;perspective:1000px}
+  .kahraman-ic{grid-template-columns:1fr;
+    grid-template-areas:"gorsel" "dugme" "yazi" "rozet";
+    gap:0}
+  .sahne{perspective:1000px;margin-bottom:26px}
+  .kahraman-dug{margin-bottom:30px}
+  .k-yazi{margin-bottom:24px}
   /* Mobilde açı küçülür ama SIFIRLANMAZ — derinlik hissi korunsun. */
   .egik{--rx:5deg;--ry:-6deg}
   .iz-4{grid-template-columns:repeat(2,1fr)}

@@ -348,18 +348,18 @@ def ana_sayfa():
 
     kahraman = """<section class="kahraman">
   <div class="kap kahraman-ic">
-    <div>
+    <div class="k-yazi">
       <span class="ust-etiket">%s · %s yıldır</span>
       <h1>İstanbul’da evden eve nakliyat<em>Hassasiyet Taşır</em></h1>
       <p class="kahraman-spot">Eşyanızı biz toplarız, biz paketleriz, biz kurarız.
       İstanbul’un Avrupa yakasındaki 25 ilçenin tamamına ve İstanbul merkezli olarak
       Türkiye’nin her iline sigortalı taşıma yapıyoruz. Keşif ücretsiz, fiyat baştan net.</p>
-      <div class="kahraman-dug">
-        <a class="dg dg-birincil" href="tel:%s">%s%s</a>
-        <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
-      </div>
-      <div class="rozetler">%s%s%s%s</div>
     </div>
+    <div class="kahraman-dug">
+      <a class="dg dg-birincil" href="tel:%s">%s%s</a>
+      <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
+    </div>
+    <div class="rozetler">%s%s%s%s</div>
     <div class="sahne">
       <div class="egik">
         %s
@@ -580,17 +580,17 @@ def ilce_sayfa(slug):
     </nav>
   </div>
   <div class="kap kahraman-ic" style="padding-top:22px">
-    <div>
+    <div class="k-yazi">
       <span class="ust-etiket">İstanbul · Avrupa yakası</span>
       <h1>%s</h1>
       <p class="kahraman-spot">%s Sigortalı taşıma, profesyonel ambalajlama ve
       ücretsiz keşif ile %s’de eşyanızı biz toplar, biz kurarız.</p>
-      <div class="kahraman-dug">
-        <a class="dg dg-birincil" href="tel:%s">%s%s</a>
-        <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
-      </div>
-      <div class="rozetler">%s%s%s</div>
     </div>
+    <div class="kahraman-dug">
+      <a class="dg dg-birincil" href="tel:%s">%s%s</a>
+      <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
+    </div>
+    <div class="rozetler">%s%s%s</div>
     <div class="sahne">
       <div class="egik">
         %s
