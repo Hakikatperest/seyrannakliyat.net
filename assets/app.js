@@ -108,21 +108,6 @@
     });
   });
 
-  /* ── Harita: gömülü iframe ancak istenince yüklenir ──────────────────── */
-  var hp = document.querySelector('.harita-perde');
-  if (hp) {
-    hp.addEventListener('click', function () {
-      var kutu = hp.parentElement, f = document.createElement('iframe');
-      f.src = hp.dataset.harita;
-      f.loading = 'lazy';
-      f.title = 'Seyran Nakliyat ofis konumu';
-      f.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-      f.setAttribute('allowfullscreen', '');
-      kutu.innerHTML = '';
-      kutu.appendChild(f);
-    });
-  }
-
   /* ── Yıl ─────────────────────────────────────────────────────────────── */
   var yil = document.getElementById('yil');
   if (yil) yil.textContent = new Date().getFullYear();

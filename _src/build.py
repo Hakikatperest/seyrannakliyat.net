@@ -125,7 +125,10 @@ def resim(ad, alt, genislikler, boyutlar, sinif='', oncelik=False, en=None, boy=
                              (' class="%s"' % sinif) if sinif else '')
 
 def ust_bar(koyu=False):
-    return """<header class="ust%s">
+    """Üst bar her sayfada AYNI: açık cam zemin, lacivert logo.
+    Eskiden kahramanın üstünde şeffaf + beyaz yazıydı; JS gecikince açık
+    bölümlerde beyaz üzerine beyaz kalıyordu. koyu parametresi artık kullanılmıyor."""
+    return """<header class="ust">
   <div class="kap ust-ic">
     <a class="logo" href="/" aria-label="%s ana sayfa">
       <span class="logo-im" aria-hidden="true">S</span>
@@ -144,8 +147,7 @@ def ust_bar(koyu=False):
       <a class="dg dg-birincil dg-kucuk" href="tel:%s">%s<span class="dg-metin">%s</span></a>
     </div>
   </div>
-</header>""" % (' ust-koyu' if koyu else '', e(FIRMA['ad']), TEL,
-                ikon('telefon'), e(FIRMA['telefon']))
+</header>""" % (e(FIRMA['ad']), TEL, ikon('telefon'), e(FIRMA['telefon']))
 
 def mobil_cubuk():
     return ('<div class="mobil-cubuk">'
@@ -289,32 +291,32 @@ def sss_bolum(sorular, baslik='Sık Sorulan Sorular',
 </section>""" % (e(baslik), e(spot), kutular)
 
 def iletisim_bolum():
+    """İletişim bölümü.
+
+    ⛔ Gömülü Google Haritalar KALDIRILDI (2026-08-25, kullanıcı kararı):
+    mobilde 4/3 oranı + min-height ile kocaman boş bir kutuya dönüşüyordu.
+    Adres yazılı olarak duruyor; yol tarifi isteyen Haritalar bağlantısını
+    kullanır. Geri EKLEME."""
     satir = lambda ik, et, dg: (
         '<div class="ilet-sat"><i>%s</i><div><b>%s</b>%s</div></div>' % (ikon(ik), e(et), dg))
+    harita_bag = 'https://www.google.com/maps/search/?api=1&query=%s,%s' % (
+        FIRMA['enlem'], FIRMA['boylam'])
     return """<section class="bolum" id="iletisim" style="background:var(--zemin-2)">
   <div class="kap">
     <div class="merkez" style="margin-bottom:38px">
-      <span class="ust-etiket">İletişim</span>
+      <span class="ust-etiket" style="justify-content:center">İletişim</span>
       <h2>Taşınma tarihinizi konuşalım</h2>
-      <p class="spot">Ücretsiz keşif için arayın; eve gelip eşyayı görelim, net fiyatı size yazılı verelim.</p>
+      <p class="spot">Ücretsiz keşif için arayın; eve gelip eşyayı görelim, net fiyatı size verelim.</p>
     </div>
-    <div class="iletisim">
-      <div class="ilet-kutu gel">
-        %s%s%s%s
-        <div style="display:flex;gap:11px;flex-wrap:wrap;margin-top:20px">
-          <a class="dg dg-birincil" href="tel:%s">%sHemen Ara</a>
-          <a class="dg dg-wa" href="%s" target="_blank" rel="noopener">%sWhatsApp</a>
-        </div>
+    <div class="ilet-kutu gel" style="max-width:620px;margin-inline:auto">
+      %s%s%s%s
+      <div style="display:flex;gap:11px;flex-wrap:wrap;margin-top:22px">
+        <a class="dg dg-birincil" href="tel:%s" style="flex:1;min-width:190px">%sHemen Ara</a>
+        <a class="dg dg-wa" href="%s" target="_blank" rel="noopener" style="flex:1;min-width:190px">%sWhatsApp</a>
       </div>
-      <div class="harita gel">
-        <button class="harita-perde" type="button" data-harita="%s"
-                aria-label="Google Haritalar’da ofis konumunu aç">
-          <i>%s</i>
-          <b>Ofisimiz — %s</b>
-          <span>Haritayı görmek için tıklayın. Sayfa hızını korumak için gömülü harita
-          ancak siz isteyince yükleniyor.</span>
-        </button>
-      </div>
+      <p style="margin:16px 0 0;text-align:center">
+        <a href="%s" target="_blank" rel="noopener" style="font-size:14.5px;font-weight:650">
+          Google Haritalar’da yol tarifi al →</a></p>
     </div>
   </div>
 </section>""" % (
@@ -323,8 +325,7 @@ def iletisim_bolum():
         satir('pin', 'Adres', '<span>%s</span>' % e(FIRMA['adres_kisa'])),
         satir('saat', 'Çalışma saatleri', '<span>Haftanın 7 günü, 24 saat</span>'),
         satir('yol', 'Hizmet alanı', '<span>%s</span>' % e(FIRMA['kapsam'])),
-        TEL, ikon('telefon'), WA_METIN, ikon('wa'),
-        e(FIRMA['harita_embed']), ikon('harita'), e(FIRMA['ilce']))
+        TEL, ikon('telefon'), WA_METIN, ikon('wa'), e(harita_bag))
 
 def son_cagri(baslik, metin):
     return """<section class="bolum">
@@ -421,29 +422,41 @@ def ana_sayfa():
   </div>
 </section>""" % adim_kart
 
+    # Vitrin: görseller tam genişlikte, kırpılmadan. Poster tipi görsellerde
+    # üstte logo altta telefon yazılı olduğu için object-fit:cover ile kırpmak
+    # bilgiyi kesiyordu — doğal en-boy oranıyla basılıyorlar.
+    # Kullanıcı isteği: karo tıklanınca telefon araması başlasın.
     gal = [('paketleme2', 'Kapalı kasa araca numaralanarak yerleştirilmiş kolilerin görünümü',
-            'Numaralı koli düzeni'),
+            'Numaralı koli düzeni', 'Her koli numaralı — yeni evde hangi kutunun nereye gideceği belli.'),
            ('seyran-nakliyat1', 'Battaniye ve balonlu naylonla paketlenmiş yatak odası takımı',
-            'Yatak odası paketleme'),
+            'Yatak odası paketleme', 'Baza, yatak ve gardırop ayrı ayrı sarılır.'),
            ('seyran-nakliyat2', 'Streç filmle sarılmış salon takımı ve koltuklar',
-            'Salon takımı paketleme'),
+            'Salon takımı paketleme', 'Koltuk ve kanepeler streç filmle tam kapatılır.'),
            ('paketleme', 'Araç içinde balonlu naylonla sarılmış yatak ve baza',
-            'Yatak ve baza koruması')]
+            'Yatak ve baza koruması', 'Araç içinde de sabitlenir, yolda kaymaz.')]
     galeri_ic = ''.join(
-        '<figure class="gal gel">%s<figcaption>%s</figcaption></figure>'
-        % (resim(ad, alt, [400, 600, 768, 900], '(max-width:620px) 46vw, (max-width:1000px) 46vw, 23vw'), e(bas))
-        for ad, alt, bas in gal)
+        """<a class="vitrin gel" href="tel:%s" aria-label="%s — aramak için dokunun">
+      %s
+      <div class="vitrin-bant">
+        <div><b>%s</b><span>%s</span></div>
+        <span class="vitrin-ara">%sAra</span>
+      </div>
+    </a>""" % (TEL, e(bas_), resim(ad, alt, [400, 600, 768, 900, 1200],
+                                   '(max-width:860px) 92vw, 46vw'),
+                e(bas_), e(aciklama), ikon('telefon'))
+        for ad, alt, bas_, aciklama in gal)
 
     galeri = """<section class="bolum bolum-koyu" id="paketleme">
   <div class="kap">
     <div class="merkez" style="margin-bottom:40px">
-      <span class="ust-etiket">Sahadan</span>
+      <span class="ust-etiket" style="justify-content:center">Sahadan</span>
       <h2 style="color:#fff">Ambalajlama işin yarısıdır</h2>
       <p class="spot">Eşyanın zarar gördüğü yer araç değil, çoğu zaman merdiven ve kapı önüdür.
       Bu yüzden her parçayı ayrı yöntemle paketliyor, kolileri numaralandırıyoruz —
-      yeni evde hangi kutunun nereye gideceği bellidir.</p>
+      yeni evde hangi kutunun nereye gideceği bellidir.
+      <strong style="color:#fff">Görsellere dokunarak bizi arayabilirsiniz.</strong></p>
     </div>
-    <div class="galeri">%s</div>
+    <div class="vitrinler">%s</div>
   </div>
 </section>""" % galeri_ic
 
