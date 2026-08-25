@@ -29,8 +29,8 @@ for sp in sayfalar:
         try: json.loads(m.group(1))
         except Exception as ex: hata.append('%s: JSON-LD bozuk — %s' % (sp, ex))
 
-    for m in re.finditer(r'(?:href|src|data-video|data-poster)="(/[^"#?]*)"', h):
-        tum_baglar.add(m.group(1))
+    for m in re.finditer(r'(?:href|src|data-video|data-poster)="(/[^"#]*)"', h):
+        tum_baglar.add(m.group(1).split('?')[0])   # ?v= sürüm damgasını at
 
     for m in re.finditer(r'srcset="([^"]+)"', h):
         for p in m.group(1).split(','):

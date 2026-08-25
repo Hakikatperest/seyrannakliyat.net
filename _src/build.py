@@ -71,6 +71,22 @@ def slugla(t):
     t = ''.join(d.get(k, k) for k in t).lower()
     return re.sub(r'[^a-z0-9]+', '-', t).strip('-')
 
+
+# ── Varlık sürümleme ─────────────────────────────────────────────────────────
+# CSS/JS `max-age=600` ile servis ediliyor; sürüm damgası olmadan düzeltmeler
+# ziyaretçiye 10 dakika boyunca ULAŞMIYOR. Dosya içeriğinin özeti damga olur:
+# içerik değişmezse URL de değişmez, önbellek boşuna bozulmaz.
+def _damga(gorece):
+    import hashlib
+    yol = os.path.join(KOK, gorece)
+    if not os.path.exists(yol):
+        return ''
+    with open(yol, 'rb') as f:
+        return hashlib.sha1(f.read()).hexdigest()[:8]
+
+CSS_SURUM = None
+JS_SURUM = None
+
 # ── Ortak parçalar ───────────────────────────────────────────────────────────
 TEL = FIRMA['telefon_link']
 WA  = 'https://wa.me/' + FIRMA['whatsapp']
@@ -195,7 +211,7 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 <meta property="og:image" content="%s/images/seyran-nakliyat.jpeg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/pjs-var-tr.woff2" crossorigin>
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v=%s">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script type="application/ld+json">%s</script>
 </head>
@@ -207,10 +223,11 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 </main>
 %s
 %s
-<script src="/assets/app.js" defer></script>
+<script src="/assets/app.js?v=%s" defer></script>
 </body>
 </html>""" % (e(baslik), e(aciklama), e(kanonik), e(FIRMA['ad']), e(baslik), e(aciklama),
-              e(kanonik), SITE, jsonld, ust_bar(koyu_ust), govde, alt_bilgi(), mobil_cubuk())
+              e(kanonik), SITE, CSS_SURUM, jsonld, ust_bar(koyu_ust), govde,
+              alt_bilgi(), mobil_cubuk(), JS_SURUM)
 
 # ── Yapısal veri ─────────────────────────────────────────────────────────────
 def isletme_ld(sayfa_url):
@@ -758,6 +775,10 @@ def yaz(gorece_yol, icerik):
 
 def main():
     import datetime
+    global CSS_SURUM, JS_SURUM
+    CSS_SURUM = _damga('assets/style.css')
+    JS_SURUM = _damga('assets/app.js')
+    print('  varlık sürümü: css=%s js=%s' % (CSS_SURUM, JS_SURUM))
     tarih = os.environ.get('BUILD_DATE') or datetime.date.today().isoformat()
 
     # Eski ilçe klasörlerini temizle (yeniden adlandırma olursa artık kalmasın).
