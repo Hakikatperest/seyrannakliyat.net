@@ -124,6 +124,23 @@ def resim(ad, alt, genislikler, boyutlar, sinif='', oncelik=False, en=None, boy=
             '</picture>') % (kaynak, boyutlar, ad, e(alt), olcu, ek,
                              (' class="%s"' % sinif) if sinif else '')
 
+
+LOGO_ISARET = (
+    '<span class="logo-im" aria-hidden="true">'
+    '<svg viewBox="0 0 32 32" fill="none">'
+    '<path d="M4.6 14.6 16 5.6l11.4 9" stroke="currentColor" stroke-width="2.7" '
+    'stroke-linecap="round" stroke-linejoin="round"/>'
+    '<path d="M7.6 16.9V25a1.4 1.4 0 0 0 1.4 1.4h14a1.4 1.4 0 0 0 1.4-1.4v-8.1" '
+    'stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>'
+    '<rect x="13.1" y="18.4" width="5.8" height="8" rx="1.4" fill="currentColor"/>'
+    '</svg></span>')
+
+def logo(alt_metin=True):
+    """Üst bar ve alt bilgi logosu."""
+    return ('%s<span class="logo-yazi"><span class="logo-ad">SEYRAN</span>'
+            '<span class="logo-alt"><span class="logo-uzun">EVDEN EVE </span>NAKLİYAT</span>'
+            '</span>') % LOGO_ISARET
+
 def ust_bar(koyu=False):
     """Üst bar her sayfada AYNI: açık cam zemin, lacivert logo.
     Eskiden kahramanın üstünde şeffaf + beyaz yazıydı; JS gecikince açık
@@ -131,8 +148,7 @@ def ust_bar(koyu=False):
     return """<header class="ust">
   <div class="kap ust-ic">
     <a class="logo" href="/" aria-label="%s ana sayfa">
-      <span class="logo-im" aria-hidden="true">S</span>
-      <span><span class="logo-ad">SEYRAN</span><span class="logo-alt">Nakliyat</span></span>
+      %s
     </a>
     <nav class="menu" id="menu">
       <a href="/#hizmetler">Hizmetler</a>
@@ -147,7 +163,19 @@ def ust_bar(koyu=False):
       <a class="dg dg-birincil dg-kucuk" href="tel:%s">%s<span class="dg-metin">%s</span></a>
     </div>
   </div>
-</header>""" % (e(FIRMA['ad']), TEL, ikon('telefon'), e(FIRMA['telefon']))
+</header>""" % (e(FIRMA['ad']), logo(), TEL, ikon('telefon'), e(FIRMA['telefon']))
+
+def bildirim():
+    """Sayfanın yarısına inildiğinde bir kez açılan çevrimiçi bildirimi."""
+    return ("""<aside class="bildirim" id="bildirim" role="status" aria-live="polite">
+  <button class="bildirim-kapat" type="button" id="bildirimKapat" aria-label="Bildirimi kapat">&times;</button>
+  <span class="bildirim-nokta" aria-hidden="true"></span>
+  <div class="bildirim-govde">
+    <b>Şu an çevrimiçiyiz</b>
+    <p>Fiyat teklifi için hemen arayın — keşif ücretsiz.</p>
+    <a class="dg dg-birincil" href="tel:%s">%s%s</a>
+  </div>
+</aside>""" % (TEL, ikon('telefon'), e(FIRMA['telefon'])))
 
 def mobil_cubuk():
     return ('<div class="mobil-cubuk">'
@@ -164,11 +192,7 @@ def alt_bilgi():
   <div class="kap">
     <div class="alt-ic">
       <div>
-        <a class="logo" href="/" style="margin-bottom:16px">
-          <span class="logo-im" aria-hidden="true">S</span>
-          <span><span class="logo-ad" style="color:#fff">SEYRAN</span>
-          <span class="logo-alt">Nakliyat</span></span>
-        </a>
+        <a class="logo" href="/" style="margin-bottom:16px">%s</a>
         <p style="font-size:14.5px;max-width:42ch">%s — %s. %s yıldır İstanbul merkezli
         çalışıyor, Türkiye’nin her iline sigortalı taşıma yapıyoruz.</p>
         <p style="font-size:14.5px"><strong style="color:#fff">%s</strong><br>%s</p>
@@ -188,7 +212,7 @@ def alt_bilgi():
       <span>%s</span>
     </div>
   </div>
-</footer>""" % (e(FIRMA['tam_ad']), e(FIRMA['slogan']), FIRMA['tecrube_yili'],
+</footer>""" % (logo(), e(FIRMA['tam_ad']), e(FIRMA['slogan']), FIRMA['tecrube_yili'],
                 e(FIRMA['adres_kisa']), e(FIRMA['telefon_uluslararasi']),
                 TEL, ikon('telefon'), e(FIRMA['telefon']),
                 hizmet_bag, ilce_bag, e(FIRMA['ad']), e(FIRMA['alan_adi']))
@@ -213,6 +237,7 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 <meta property="og:image" content="%s/images/seyran-nakliyat.jpeg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/pjs-var-tr.woff2" crossorigin>
+<script>document.documentElement.className+=" js"</script>
 <link rel="stylesheet" href="/assets/style.css?v=%s">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script type="application/ld+json">%s</script>
@@ -225,11 +250,12 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 </main>
 %s
 %s
+%s
 <script src="/assets/app.js?v=%s" defer></script>
 </body>
 </html>""" % (e(baslik), e(aciklama), e(kanonik), e(FIRMA['ad']), e(baslik), e(aciklama),
               e(kanonik), SITE, CSS_SURUM, jsonld, ust_bar(koyu_ust), govde,
-              alt_bilgi(), mobil_cubuk(), JS_SURUM)
+              alt_bilgi(), bildirim(), mobil_cubuk(), JS_SURUM)
 
 # ── Yapısal veri ─────────────────────────────────────────────────────────────
 def isletme_ld(sayfa_url):
@@ -277,7 +303,7 @@ def guven_serit(ilce_sayisi=25):
 def sss_bolum(sorular, baslik='Sık Sorulan Sorular',
               spot='Taşınmadan önce en çok merak edilenler.'):
     kutular = ''.join(
-        '<details class="sor gel"><summary>%s</summary><div class="cevap"><p>%s</p></div></details>'
+        '<details class="sor gel gel-3b"><summary>%s</summary><div class="cevap"><p>%s</p></div></details>'
         % (e(s), e(c)) for s, c in sorular)
     return """<section class="bolum" id="sss">
   <div class="kap">
@@ -356,7 +382,7 @@ def ana_sayfa():
       Türkiye’nin her iline sigortalı taşıma yapıyoruz. Keşif ücretsiz, fiyat baştan net.</p>
     </div>
     <div class="kahraman-dug">
-      <a class="dg dg-birincil" href="tel:%s">%s%s</a>
+      <a class="dg dg-mavi" href="tel:%s">%s%s</a>
       <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
     </div>
     <div class="rozetler">%s%s%s%s</div>
@@ -377,7 +403,7 @@ def ana_sayfa():
         ikon('kalkan'), FIRMA['tecrube_yili'])
 
     hizmet_kart = ''.join(
-        """<article class="kart kart-hizmet gel">
+        """<article class="kart kart-hizmet gel gel-3b">
       <div class="kart-im">%s</div><h3>%s</h3><p>%s</p></article>"""
         % (ikon(HIZMET_IK.get(k, 'kutu')), e(ad), e(ac)) for k, ad, ac in HIZMETLER)
 
@@ -394,7 +420,7 @@ def ana_sayfa():
 </section>""" % hizmet_kart
 
     ozellik_kart = ''.join(
-        """<article class="kart gel"><div class="kart-im">%s</div><h3>%s</h3><p>%s</p></article>"""
+        """<article class="kart gel gel-3b"><div class="kart-im">%s</div><h3>%s</h3><p>%s</p></article>"""
         % (ikon(ik), e(ad), e(ac)) for ik, ad, ac in OZELLIKLER)
 
     neden = """<section class="bolum" style="background:var(--zemin-2)" id="neden">
@@ -409,7 +435,7 @@ def ana_sayfa():
   </div>
 </section>""" % ozellik_kart
 
-    adim_kart = ''.join('<article class="adim gel"><h3>%s</h3><p>%s</p></article>' % (e(a), e(b))
+    adim_kart = ''.join('<article class="adim gel gel-3b"><h3>%s</h3><p>%s</p></article>' % (e(a), e(b))
                         for a, b in ADIMLAR)
     nasil = """<section class="bolum" id="nasil">
   <div class="kap">
@@ -435,7 +461,7 @@ def ana_sayfa():
            ('paketleme', 'Araç içinde balonlu naylonla sarılmış yatak ve baza',
             'Yatak ve baza koruması', 'Araç içinde de sabitlenir, yolda kaymaz.')]
     galeri_ic = ''.join(
-        """<a class="vitrin gel" href="tel:%s" aria-label="%s — aramak için dokunun">
+        """<a class="vitrin gel gel-3b" href="tel:%s" aria-label="%s — aramak için dokunun">
       %s
       <div class="vitrin-bant">
         <div><b>%s</b><span>%s</span></div>
@@ -465,7 +491,7 @@ def ana_sayfa():
             ('nakliye-video3', 'seyran-nakliyat3', 'Ofisimiz'),
             ('nakliye-video4', 'paketleme', 'Paketleme')]
     video_ic = ''.join(
-        """<div class="vid gel">
+        """<div class="vid gel gel-3b">
       <img src="/images/w%d/%s.webp" alt="%s" loading="lazy" decoding="async"
            style="object-fit:cover">
       <button class="vid-dug" type="button" data-video="/video/%s.mp4" data-poster="/images/w%d/%s.webp"
@@ -587,7 +613,7 @@ def ilce_sayfa(slug):
       ücretsiz keşif ile %s’de eşyanızı biz toplar, biz kurarız.</p>
     </div>
     <div class="kahraman-dug">
-      <a class="dg dg-birincil" href="tel:%s">%s%s</a>
+      <a class="dg dg-mavi" href="tel:%s">%s%s</a>
       <a class="dg dg-cam" href="%s" target="_blank" rel="noopener">%sWhatsApp’tan fiyat alın</a>
     </div>
     <div class="rozetler">%s%s%s</div>
@@ -614,7 +640,7 @@ def ilce_sayfa(slug):
 
     metin = """<section class="bolum">
   <div class="kap">
-    <div class="metin gel">
+    <div class="metin">
       <h2>%s’de nakliyat neden farklı?</h2>
       <p>%s</p>
       <p>%s</p>
@@ -662,7 +688,7 @@ def ilce_sayfa(slug):
                 e(ad), e(ad), semt_et, e(ad), e(ad), e(ad), e(ad),
                 e(ad), e(IPUCU.get(slug, '')), e(ad), e(ad))
 
-    adim_kart = ''.join('<article class="adim gel"><h3>%s</h3><p>%s</p></article>' % (e(a), e(b))
+    adim_kart = ''.join('<article class="adim gel gel-3b"><h3>%s</h3><p>%s</p></article>' % (e(a), e(b))
                         for a, b in ADIMLAR)
     nasil = """<section class="bolum" style="background:var(--zemin-2)">
   <div class="kap">
@@ -756,13 +782,19 @@ def sayfa_404():
                    isletme_ld(SITE))
 
 def favicon():
+    """Sekme simgesi — üst bardaki marka işaretinin aynısı."""
     return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
             '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-            '<stop offset="0" stop-color="#ff8b45"/><stop offset=".55" stop-color="#f26722"/>'
+            '<stop offset="0" stop-color="#ff9a52"/><stop offset=".48" stop-color="#f26722"/>'
             '<stop offset="1" stop-color="#d8232a"/></linearGradient></defs>'
-            '<rect width="64" height="64" rx="15" fill="url(#g)"/>'
-            '<text x="32" y="45" font-family="Segoe UI,Roboto,Helvetica,Arial,sans-serif" '
-            'font-size="38" font-weight="800" fill="#fff" text-anchor="middle">S</text></svg>')
+            '<rect width="64" height="64" rx="16" fill="url(#g)"/>'
+            '<g transform="translate(16 16) scale(1)" stroke="#fff" fill="none" '
+            'stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">'
+            '<path d="M4.6 14.6 16 5.6l11.4 9"/>'
+            '<path d="M7.6 16.9V25a1.4 1.4 0 0 0 1.4 1.4h14a1.4 1.4 0 0 0 1.4-1.4v-8.1"/>'
+            '</g>'
+            '<rect x="42.2" y="52.4" width="11.6" height="16" rx="2.8" fill="#fff" '
+            'transform="translate(-16 -16)"/></svg>')
 
 def sitemap(tarih):
     girdiler = ['<url><loc>%s/</loc><lastmod>%s</lastmod><changefreq>weekly</changefreq>'

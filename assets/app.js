@@ -51,8 +51,25 @@
           k.target.classList.add('gorundu');
           g.unobserve(k.target);
         });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+      }, { rootMargin: '0px 0px -4% 0px', threshold: 0 });
       gelenler.forEach(function (e) { g.observe(e); });
+
+      /* Güvenlik ağı: gözlemci herhangi bir sebeple tetiklenmezse içerik
+         gizli kalmamalı. Uzun bloklarda 3B döndürme sınır kutusunu da
+         döndürdüğü için tetikleme gecikip "beyaz ekran" oluşuyordu. */
+      setTimeout(function () {
+        document.querySelectorAll('.gel:not(.gorundu)').forEach(function (el) {
+          var k = el.getBoundingClientRect();
+          if (k.top < innerHeight * 1.5) el.classList.add('gorundu');
+        });
+      }, 2500);
+      addEventListener('load', function () {
+        setTimeout(function () {
+          document.querySelectorAll('.gel:not(.gorundu)').forEach(function (el) {
+            if (el.getBoundingClientRect().top < innerHeight) el.classList.add('gorundu');
+          });
+        }, 300);
+      });
     }
   }
 
@@ -151,6 +168,33 @@
       v.play().catch(function () {});
     });
   });
+
+  /* ── Çevrimiçi bildirimi ─────────────────────────────────────────────
+     Sayfanın yarısına inilince bir kez açılır. Kapatılırsa oturum boyunca
+     tekrar gelmez — her kaydırmada yüzüne çıkan bildirim rahatsız eder. */
+  var bldrm = document.getElementById('bildirim');
+  if (bldrm) {
+    var kapali = false;
+    try { kapali = sessionStorage.getItem('sn-bildirim') === 'kapali'; } catch (e) {}
+    var acildi = false;
+
+    function bildirimBak() {
+      if (acildi || kapali) return;
+      var toplam = document.documentElement.scrollHeight - innerHeight;
+      if (toplam > 0 && scrollY / toplam >= 0.5) {
+        acildi = true;
+        bldrm.classList.add('acik');
+        removeEventListener('scroll', bildirimBak);
+      }
+    }
+    if (!kapali) addEventListener('scroll', bildirimBak, { passive: true });
+
+    document.getElementById('bildirimKapat').addEventListener('click', function () {
+      bldrm.classList.remove('acik');
+      kapali = true;
+      try { sessionStorage.setItem('sn-bildirim', 'kapali'); } catch (e) {}
+    });
+  }
 
   /* ── Yıl ─────────────────────────────────────────────────────────────── */
   var yil = document.getElementById('yil');
