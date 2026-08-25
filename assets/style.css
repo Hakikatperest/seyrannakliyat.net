@@ -176,7 +176,24 @@ p{margin:0 0 1.05em}
   box-shadow:0 40px 90px rgba(0,0,0,.45), 0 8px 22px rgba(0,0,0,.32),
              inset 0 1px 0 rgba(255,255,255,.20);
   border:1px solid rgba(255,255,255,.16);
+  animation:egikAc 1.15s cubic-bezier(.16,1,.3,1) .1s both;
 }
+.egik.acildi{animation:none}
+/* Görsel uzaktan, eğik ve bulanık başlar; yerine oturarak netleşir.
+   Mobilde de çalışır — asıl "açılış" hissi burada. */
+@keyframes egikAc{
+  0%  {opacity:0;transform:rotateX(30deg) rotateY(-20deg) translateY(52px) scale(.84);filter:blur(12px)}
+  60% {opacity:1;filter:blur(0)}
+  100%{opacity:1;transform:rotateX(var(--rx,7deg)) rotateY(var(--ry,-9deg)) translateY(0) scale(1);filter:blur(0)}
+}
+/* Yerine oturduktan sonra yüzeyde bir kez ışık geçer. */
+.egik::before{
+  content:"";position:absolute;inset:-20% -60%;z-index:2;pointer-events:none;
+  background:linear-gradient(105deg,transparent 34%,rgba(255,255,255,.46) 48%,transparent 62%);
+  transform:translateX(-115%);
+  animation:egikParla 1.5s cubic-bezier(.3,.1,.2,1) 1.05s both;
+}
+@keyframes egikParla{to{transform:translateX(115%)}}
 .egik img{width:100%;display:block}
 .egik::after{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -214,6 +231,7 @@ p{margin:0 0 1.05em}
   transition:transform var(--gecis),box-shadow var(--gecis),border-color var(--gecis);
 }
 .kart:hover{transform:translateY(-5px);border-color:#cfdcf0;box-shadow:var(--g2),var(--isik)}
+.kart:active,.ilce:active,.vitrin:active{transform:scale(.985)}
 .kart h3{margin-bottom:9px;color:var(--navy)}
 .kart p{color:var(--ink-2);font-size:15px;margin:0}
 .kart-im{
@@ -383,8 +401,12 @@ p{margin:0 0 1.05em}
 .kirinti span{color:#6f86ad}
 
 /* ── Ortaya çıkış animasyonu ──────────────────────────────────────────────── */
-.gel{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.22,.68,0,1),
-  transform .7s cubic-bezier(.22,.68,0,1)}
+/* Ortaya çıkış 3B: kart düzlemden kalkarak yerine oturur. Mobilde fare
+   yokken derinlik hissini veren asıl şey bu. Yalnızca transform+opacity
+   değiştiği için GPU'da çalışır, kaydırmayı yavaşlatmaz. */
+.gel{opacity:0;transform:perspective(900px) translateY(32px) rotateX(10deg) scale(.982);
+  transform-origin:50% 100%;
+  transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
 .gel.gorundu{opacity:1;transform:none}
 
 /* ── Metin bloğu (ilçe sayfaları) ─────────────────────────────────────────── */
@@ -406,8 +428,9 @@ p{margin:0 0 1.05em}
 /* ── Duyarlı ──────────────────────────────────────────────────────────────── */
 @media(max-width:1000px){
   .kahraman-ic{grid-template-columns:1fr;gap:38px}
-  .sahne{order:-1}
-  .egik{transform:none}
+  .sahne{order:-1;perspective:1000px}
+  /* Mobilde açı küçülür ama SIFIRLANMAZ — derinlik hissi korunsun. */
+  .egik{--rx:5deg;--ry:-6deg}
   .iz-4{grid-template-columns:repeat(2,1fr)}
   .iz-3{grid-template-columns:repeat(2,1fr)}
   .adimlar{grid-template-columns:repeat(2,1fr)}

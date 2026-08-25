@@ -42,6 +42,12 @@
       var g = new IntersectionObserver(function (kayitlar) {
         kayitlar.forEach(function (k) {
           if (!k.isIntersecting) return;
+          /* Aynı kaptaki kardeşler sırayla kalksın — tek tek değil, dalga hâlinde. */
+          var kardesler = Array.prototype.filter.call(
+            k.target.parentElement ? k.target.parentElement.children : [],
+            function (c) { return c.classList.contains('gel'); });
+          var i = kardesler.indexOf(k.target);
+          if (i > 0) k.target.style.transitionDelay = Math.min(i, 6) * 70 + 'ms';
           k.target.classList.add('gorundu');
           g.unobserve(k.target);
         });
@@ -50,26 +56,64 @@
     }
   }
 
-  /* ── Kahraman görselinde 3B eğim ─────────────────────────────────────
-     Yalnızca fare olan cihazlarda; dokunmatikte sabit açı kalır.        */
+  /* ── Kahraman görselinde 3B ───────────────────────────────────────────
+     Üç kaynak: fare (masaüstü), sayfa kaydırma (her cihaz) ve cihaz eğimi
+     (telefonu yatırınca — Android'de izinsiz çalışır). Üçü de aynı iki CSS
+     değişkenini yazar, hepsi rAF ile tek kareye indirilir. */
   var sahne = document.querySelector('.sahne'), egik = document.querySelector('.egik');
-  if (sahne && egik && !azHareket && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    var bekleyen = null;
-    sahne.addEventListener('pointermove', function (e) {
-      if (bekleyen) return;
-      bekleyen = requestAnimationFrame(function () {
-        bekleyen = null;
+  if (egik) {
+    /* Açılış animasyonu bitince bırak: fill-mode "both" ile asılı kalırsa
+       CSS transition'ı ezer ve fare/eğim hareketi sert görünür. */
+    egik.addEventListener('animationend', function (e) {
+      if (e.animationName === 'egikAc') egik.classList.add('acildi');
+    });
+  }
+  if (sahne && egik && !azHareket) {
+    var temelRX = 7, temelRY = -9;
+    if (matchMedia('(max-width:1000px)').matches) { temelRX = 5; temelRY = -6; }
+
+    var fareX = 0, fareY = 0, egimX = 0, egimY = 0, kaydirma = 0, bekleyen = null;
+
+    function ciz() {
+      bekleyen = null;
+      var rx = temelRX - fareY * 11 - egimX + kaydirma * 9;
+      var ry = temelRY + fareX * 13 + egimY;
+      egik.style.setProperty('--rx', rx.toFixed(2) + 'deg');
+      egik.style.setProperty('--ry', ry.toFixed(2) + 'deg');
+    }
+    function iste() { if (!bekleyen) bekleyen = requestAnimationFrame(ciz); }
+
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      sahne.addEventListener('pointermove', function (e) {
         var k = sahne.getBoundingClientRect();
-        var x = (e.clientX - k.left) / k.width - 0.5;
-        var y = (e.clientY - k.top) / k.height - 0.5;
-        egik.style.setProperty('--ry', (-9 + x * 13).toFixed(2) + 'deg');
-        egik.style.setProperty('--rx', (7 - y * 11).toFixed(2) + 'deg');
+        fareX = (e.clientX - k.left) / k.width - 0.5;
+        fareY = (e.clientY - k.top) / k.height - 0.5;
+        iste();
       });
-    });
-    sahne.addEventListener('pointerleave', function () {
-      egik.style.removeProperty('--ry');
-      egik.style.removeProperty('--rx');
-    });
+      sahne.addEventListener('pointerleave', function () { fareX = fareY = 0; iste(); });
+    }
+
+    /* Kaydırdıkça görsel hafifçe arkaya yatar — mobilde asıl derinlik burada. */
+    addEventListener('scroll', function () {
+      var k = sahne.getBoundingClientRect();
+      if (k.bottom < 0 || k.top > innerHeight) return;
+      kaydirma = Math.max(-1, Math.min(1, -k.top / innerHeight));
+      iste();
+    }, { passive: true });
+
+    /* Cihaz eğimi: iOS izin istediği için yalnızca izin gerektirmeyen
+       tarayıcılarda (Android) bağlanıyor; istem çıkarıp kullanıcıyı
+       rahatsız etmiyoruz. */
+    if (window.DeviceOrientationEvent &&
+        typeof DeviceOrientationEvent.requestPermission !== 'function' &&
+        matchMedia('(hover: none)').matches) {
+      addEventListener('deviceorientation', function (e) {
+        if (e.beta === null && e.gamma === null) return;
+        egimX = Math.max(-8, Math.min(8, ((e.beta || 0) - 45) * 0.16));
+        egimY = Math.max(-9, Math.min(9, (e.gamma || 0) * 0.20));
+        iste();
+      }, { passive: true });
+    }
   }
 
   /* ── Sayaçlar ────────────────────────────────────────────────────────── */
