@@ -182,6 +182,25 @@ def mobil_cubuk():
             '<a class="dg dg-wa" href="%s" target="_blank" rel="noopener">%sWhatsApp</a>'
             '</div>') % (TEL, ikon('telefon'), WA_METIN, ikon('wa'))
 
+def w4_kredi():
+    """Her sayfanın en altındaki tasarım imzası.
+
+    Marka yazımı Web4Medya'nın kendi kullanımıyla aynı: "Web" ve "Medya" beyaz,
+    aradaki "4" mavi. Lacivert alt bilgide markanın #0B57D0 mavisi okunmuyor —
+    aynı ailenin açık tonu (--w4-mavi) kullanılıyor.
+
+    ⚠️ Bağlantı YALNIZCA marka adını sarar; "Web Tasarım" etiketi <a> dışında
+    kalır. 27 sayfadan çıkan site geneli, anahtar kelimeli tasarımcı bağlantısı
+    Google'ın link şeması tarifine giriyor — bilinçli tercih, geri çevirme.
+    """
+    return """<div class="w4">
+      <div class="w4-bag">
+        <span class="w4-etiket">Web Tasarım</span>
+        <a class="w4-ad" href="https://www.web4medya.com/" target="_blank" rel="noopener"
+           title="Web4Medya — web tasarım ve Google Ads">Web<span class="w4-d">4</span>Medya</a>
+      </div>
+    </div>"""
+
 def alt_bilgi():
     ilce_bag = ''.join(
         '<a href="/%s-evden-eve-nakliyat/">%s</a>' % (s, e(v[0]))
@@ -210,11 +229,12 @@ def alt_bilgi():
       <span>&copy; <span id="yil">2026</span> %s. Tüm hakları saklıdır.</span>
       <span>%s</span>
     </div>
+    %s
   </div>
 </footer>""" % (logo(koyu_zemin=True), e(FIRMA['tam_ad']), e(FIRMA['slogan']), FIRMA['tecrube_yili'],
                 e(FIRMA['adres_kisa']), e(FIRMA['telefon_uluslararasi']),
                 TEL, ikon('telefon'), e(FIRMA['telefon']),
-                hizmet_bag, ilce_bag, e(FIRMA['ad']), e(FIRMA['alan_adi']))
+                hizmet_bag, ilce_bag, e(FIRMA['ad']), e(FIRMA['alan_adi']), w4_kredi())
 
 def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
     return """<!DOCTYPE html>

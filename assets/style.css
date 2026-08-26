@@ -17,6 +17,9 @@
   --ink:#0d1526; --ink-2:#46536b; --ink-3:#7d8aa0;
   --yuzey:#ffffff; --zemin:#f4f7fc; --zemin-2:#eaf0f9;
   --cizgi:#e2e9f4; --cizgi-2:#eef3fa;
+  /* Web4Medya imzası: markanın kendi mavisi #0B57D0, lacivert zeminde
+     okunmadığı için aynı ailenin açık tonu kullanılıyor. */
+  --w4-mavi:#4d90ff;
 
   --r1:12px; --r2:18px; --r3:26px;
   --g1:0 1px 2px rgba(13,21,38,.05), 0 3px 10px rgba(13,21,38,.05);
@@ -400,8 +403,59 @@ p{margin:0 0 1.05em}
 .alt ul{list-style:none;margin:0;padding:0;display:grid;gap:9px}
 .alt-ilceler{columns:2;column-gap:24px}
 .alt-ilceler a{display:block;padding:3px 0;font-size:13.5px;break-inside:avoid}
-.alt-son{margin-top:44px;border-top:1px solid rgba(255,255,255,.10);padding:22px 0 28px;
+.alt-son{margin-top:44px;border-top:1px solid rgba(255,255,255,.10);padding:22px 0 20px;
   display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:13.5px}
+
+/* ── Tasarım imzası (Web4Medya) ───────────────────────────────────────────
+   Her sayfanın en altında. Rozetin tamamı değil, YALNIZCA marka adı bağlantı
+   (site geneli anahtar kelimeli tasarımcı linki riski) — ama premium his için
+   rozet, içindeki bağlantı gezinildiğinde `:has()` ile birlikte kalkıyor.
+   ⚠️ Seçiciler `.alt` ile başlıyor: `.alt a` (0,1,1) ve `.alt a:hover` (0,2,1)
+   renk/punto dayatıyor, tek sınıf onları yenemez.
+   ⚠️ Rozet `overflow:hidden` — parlama sıyırması dışarı taşmasın. */
+.w4{position:relative;display:flex;justify-content:center;padding:0 0 30px}
+.w4::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:min(380px,66%);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent)}
+.w4-bag{position:relative;overflow:hidden;isolation:isolate;
+  display:inline-flex;align-items:center;gap:10px;margin-top:20px;padding:12px 20px;
+  border-radius:999px;line-height:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  transition:transform var(--gecis),border-color var(--gecis),
+             box-shadow var(--gecis),background var(--gecis)}
+.w4-bag:has(.w4-ad:hover),.w4-bag:has(.w4-ad:focus-visible){
+  transform:translateY(-2px);border-color:rgba(77,144,255,.45);
+  background:linear-gradient(180deg,rgba(77,144,255,.14),rgba(255,255,255,.02));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 10px 26px rgba(11,87,208,.30)}
+.w4-bag::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.18) 50%,transparent 60%);
+  transform:translateX(-130%)}
+.w4-bag:has(.w4-ad:hover)::after{animation:w4Siyrik .9s cubic-bezier(.3,.7,.3,1)}
+@keyframes w4Siyrik{to{transform:translateX(130%)}}
+
+.w4-etiket{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:#8fa6cd;transition:color var(--gecis)}
+.w4-etiket::after{content:":";margin-left:2px;opacity:.55}
+.w4-bag:has(.w4-ad:hover) .w4-etiket{color:#c6d5f0}
+
+/* Tek tıklanabilir öğe. `.alt a:hover` turuncuya çeviriyor — burada beyaz kalmalı. */
+.alt .w4-ad{position:relative;font-size:15px;font-weight:800;letter-spacing:.005em;
+  color:#fff;white-space:nowrap;text-decoration:none}
+.alt .w4-ad:hover,.alt .w4-ad:focus-visible{color:#fff}
+.alt .w4-ad:focus-visible{outline:2px solid var(--w4-mavi);outline-offset:4px;border-radius:4px}
+.w4-ad::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1.5px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--w4-mavi),transparent);
+  transform:scaleX(0);transition:transform var(--gecis)}
+.w4-ad:hover::after{transform:scaleX(1)}
+.w4-d{color:var(--w4-mavi);text-shadow:0 0 14px rgba(77,144,255,.55);
+  transition:text-shadow var(--gecis)}
+.w4-ad:hover .w4-d{text-shadow:0 0 20px rgba(77,144,255,.9)}
+@media(max-width:470px){
+  .w4-bag{gap:8px;padding:11px 16px;flex-wrap:wrap;justify-content:center;text-align:center}
+  .w4-etiket{font-size:11px;letter-spacing:.11em}
+}
 
 /* ── Mobil alt çubuk ──────────────────────────────────────────────────────── */
 .mobil-cubuk{display:none;position:fixed;left:0;right:0;bottom:0;z-index:70;gap:10px;padding:10px 14px
