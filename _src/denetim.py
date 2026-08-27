@@ -38,7 +38,8 @@ for sp in sayfalar:
             if u.startswith('/'): tum_baglar.add(u)
 
     if 'alt=""' in h: hata.append(sp + ': boş alt var')
-    # web4medya.com yalnız alt bilgideki tasarım imzası bağlantısı — istek doğurmaz.
+    # web4medya.com iki yerde: alt bilgideki tasarım imzası bağlantısı (istek doğurmaz)
+    # ve head'deki w4t.js tıklama takibi (async, tek dış istek — 2026-08-27'de eklendi).
     for m in re.finditer(r'https?://(?!seyrannakliyat\.net|wa\.me|www\.google\.com/maps|www\.web4medya\.com)([a-z0-9.\-]+)', h):
         if m.group(1) not in ('schema.org', 'www.w3.org'):
             hata.append('%s: dış kaynak %s' % (sp, m.group(1)))

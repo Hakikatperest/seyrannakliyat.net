@@ -242,6 +242,7 @@ def iskelet(baslik, aciklama, kanonik, govde, jsonld, koyu_ust=True):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script async src="https://www.web4medya.com/w4t.js" data-key="w4-vz90emvnkbgelxvb"></script>
 <title>%s</title>
 <meta name="description" content="%s">
 <link rel="canonical" href="%s">
